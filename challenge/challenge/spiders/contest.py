@@ -2,6 +2,8 @@ import scrapy
 
 from urllib.parse import urljoin, urlparse
 
+from challenge.items import ChallengeItem
+
 class ContestSpider(scrapy.Spider):
     name = 'contest'
     allowed_domains = ['contest-646508-5umjfyjn4a-ue.a.run.app']
@@ -21,4 +23,18 @@ class ContestSpider(scrapy.Spider):
             yield scrapy.Request(next_page_url, callback=self.parse_product_list)
 
     def parse_product_page(self, response):
-        pass
+        item = ChallengeItem()
+        
+        item['item_id'] = response.xpath("//span[@id='uuid']/text()").get()
+        item['name'] = response.xpath('//div[@class="left-content"]/h2/text()').get()
+        item['flavor'] = response.xpath("//p[contains(text(), 'Flavor:')]/span/text()").get() # TODO: some products need API call for this
+        
+        image_path = response.xpath('//div[@class="right-image"]/img/@src').get()
+
+        if image_path is not None:
+            image_filename = image_path.split('/')[-1]
+            image_id = image_filename.split('.')[0]
+            item['image_id'] = image_id
+
+        yield item
+
