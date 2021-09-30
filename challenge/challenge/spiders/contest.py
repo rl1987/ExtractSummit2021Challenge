@@ -62,6 +62,14 @@ class ContestSpider(scrapy.Spider):
 
             yield scrapy.Request(api_url, meta=meta_dict, callback=self.parse_product_flavor)
 
+        product_links = response.xpath('//a[contains(@href, "/listing/i/")]/@href').getall()
+        self.logger.info("Found {} product links on {}".format(len(product_links), response.url))
+
+        for product_link in product_links:
+            product_url = urljoin(response.url, product_link)
+            yield scrapy.Request(product_url, callback=self.parse_product_page)
+
+
     def parse_product_flavor(self, response):
         meta_dict = response.meta
         item = meta_dict.get('item')
