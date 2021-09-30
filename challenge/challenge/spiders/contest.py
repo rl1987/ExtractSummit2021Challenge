@@ -41,7 +41,7 @@ class ContestSpider(scrapy.Spider):
             image_id = image_filename.split('.')[0]
             item['image_id'] = image_id
 
-        if item.get('image_id') == 'first_service':
+        if item.get('image_id') is None or item.get('image_id') == 'first_service' or 'thumb' in item.get('image_id'):
             try:
                 js = response.xpath('//script[@type="text/javascript"]/text()').get()
                 idx1 = js.index('const iid = ') + len("const iid = '")
