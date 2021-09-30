@@ -15,7 +15,7 @@ class ContestSpider(scrapy.Spider):
             product_url = urljoin(response.url, product_link)
             yield scrapy.Request(product_url, callback=self.parse_product_page)
 
-        next_page_link = response.xpath('//a[contains(@href, "page=")]/@href').get()
+        next_page_link = response.xpath('//a[.//h2[contains(text(), "Next Page")]]/@href').get()
         if next_page_link is not None:
             next_page_url = urljoin(response.url, next_page_link)
             yield scrapy.Request(next_page_url, callback=self.parse_product_list)
