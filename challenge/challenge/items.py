@@ -8,5 +8,8 @@ import scrapy
 
 class ChallengeItem(scrapy.Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    item_id = scrapy.Field()
+    name = scrapy.Field()
+    image_id = scrapy.Field()
+    flavor = scrapy.Field()
+    
