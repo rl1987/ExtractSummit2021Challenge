@@ -1,6 +1,7 @@
 import scrapy
 
 from urllib.parse import urljoin, urlparse
+import json
 
 from challenge.items import ChallengeItem
 
@@ -35,6 +36,28 @@ class ContestSpider(scrapy.Spider):
             image_filename = image_path.split('/')[-1]
             image_id = image_filename.split('.')[0]
             item['image_id'] = image_id
+
+
+        if item.get('flavor') is not None and item.get('flavor') != 'NO FLAVOR':
+            yield item
+        else:
+            api_url = response.xpath('//span[@class="flavor"]/@data-flavor').get()
+            api_url = urljoin(response.url, api_url)
+            
+            meta_dict = {'item' : item}
+
+            yield scrapy.Request(api_url, meta=meta_dict, callback=self.parse_product_flavor)
+
+    def parse_product_flavor(self, response):
+        meta_dict = response.meta
+        item = meta_dict.get('item')
+
+        json_str = response.text
+        json_dict = json.loads(json_str)
+
+        flavor = json_dict.get('value')
+
+        item['flavor'] = flavor
 
         yield item
 
